@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>SCOREzZZZZZZZ½!!!!!!!</title>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <meta charset="utf-8">
+    <script type="text/javascript">
+        function get_random_color() {
+            var letters = '0123456789ABCDEF'.split('');
+            var color = '#';
+            for (var i = 0; i < 6; i++ ) {
+                color += letters[Math.round(Math.random() * 15)];
+            }
+            return color;
+        }
+
+        function blink(e) {
+            e.fadeTo('normal', 0.0001, function() {
+                $(this).fadeTo('normal', 1.0, function() {
+                    $(this).css('color', get_random_color())
+                    blink(e);
+                });
+            })
+        }
+        $(function() {
+            blink($('marquee'));
+        })
+    </script>
+</head>
+<body>
+Här ska jerran fixa fina grafer! (Implementera enligt skiss nedan)
+<marquee style="color: red;">Använd för fan inte webkit-saker</marquee>
+
+<pre>
+   |           Calle
+   |   Jerry    ___
+   |    ___    |   |   Robert
+   |   |   |   |   |    ___   Fisken
+   |   |   |   |   |   |   |    ___
+   |   |   |   |   |   |   |   |   |
+   +--------------------------------------------->
+</pre>
+</body>
+</html>

@@ -59,6 +59,11 @@ exports.init = function() {
 
         }
     });
+
+    $('#volume-form').submit(function(e) {
+        e.preventDefault();
+        player.setVolume(1.0);//controls.volume(1.0);
+    });
 };
 
 
@@ -72,8 +77,15 @@ var controls = {
     resume : function() {
         player.playing = true;
     },
-    stop : function() {
-        player.play(null);
+    next : function() {
+        if(player.track) {
+            player.position = -1;
+        }
+    },
+    restart : function() {
+        if(player.track) {
+            player.position = 0;
+        }
     }
 };
 
