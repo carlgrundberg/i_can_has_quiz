@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>I Can Has Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <script src="jquery.min.js"></script>
+    <script src="jquery.mobile-1.0.1/jquery.mobile-1.0.1.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="ICanHaz.min.js"></script>
+    <link rel="stylesheet" href="jquery.mobile-1.0.1/jquery.mobile-1.0.1.min.css"/>
+    <link rel="stylesheet" href="../ichq.css"/>
+    <script id="track" type="text/html">
+        <li>
+            <a href="{{ uri }}">
+                <img class="image" src="{{ image }}"/>
+                <h3 class="track">{{ name }}</h3>
+                <p class="album">{{ album.name }}</p>
+                <p class="artist">{{ album.artist.name }}</p>
+            </a>
+        </li>
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            socket = io.connect('http://ichq.com:1337');
+            socket.on('connect', function() {
+                socket.emit('join', {room: 'testing client'});
+                socket.emit('get-current-track');
+                socket.on('current-track', function(data) {
+                    var list = $('#currenttrack');
+                    $('li', list).not(":jqmData(role='list-header')").remove();
+                    list.append(ich.track(data.track)).listview('refresh');
+                });
+                $('.playercontrol').click(function() {
+                    socket.emit('player', { state: $(this).data('state') });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header">
+        <h1>I Can Has Quiz?</h1>
+    </div>
+    <div data-role="content">
+        <ul id="currenttrack" data-role="listview" data-inset="true">
+            <li data-role="list-header">Now Playing</li>
+            <li>Nothing</li>
+        </ul>
+        <a class="playercontrol" data-state="pause" href="#" data-role="button">Pause</a>
+        <a class="playercontrol" data-state="resume" href="#" data-role="button">Resume</a>
+    </div>
+</div>
+</body>
+</html>

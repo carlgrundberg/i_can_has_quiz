@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>I Can Has Quiz</title>
+    <script src="server/jquery.min.js"></script>
+    <script src="http://ichq.com:1337/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="sp://import/css/adam.css">
+    <link rel="stylesheet" href="ichq.css">
+    <script type="text/javascript">
+        $(function() {
+            sp = getSpotifyApi(1);
+            ichq = sp.require('ichq');
+            ichq.init();
+        });
+    </script>
+</head>
+<body>
+<h1 id="header">I Can Haz Quiz! LOLz!!!</h1>
+
+<form id="load-playlist-form">
+    <input type="text" name="uri"/>
+    <input type="submit" value="I Can Has Playlizt?"/>
+</form>
+
+<form id="answer-form">
+    <input type="text" name="answer"/>
+    <input type="submit" value="I Has Answerz!"/>
+</form>
+
+<div id="result"></div>
+
+<img src="cat.jpg" alt="LOLCAT"/>
+
+</body>
+</html>

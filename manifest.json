@@ -1,0 +1,16 @@
+{
+    "BundleType": "Application",
+    "AppIcon": {
+        "36x18": "icon.png"
+    },
+    "AppName": {
+        "en": "ICanHasQuiz"
+    },
+    "SupportedLanguages": [
+        "en"
+    ],
+    "RequiredPermissions": [
+        "http://code.jquery.com",
+        "http://ichq.com"
+    ]
+}
