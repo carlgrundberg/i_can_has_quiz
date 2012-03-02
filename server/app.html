@@ -11,31 +11,57 @@
     <script src="socket.io/socket.io.js"></script>
     <script src="ICanHaz.min.js"></script>
     <link rel="stylesheet" href="jquery.mobile-1.0.1/jquery.mobile-1.0.1.min.css"/>
-    <link rel="stylesheet" href="../ichq.css"/>
-    <script id="track" type="text/html">
+    <!--<link rel="stylesheet" href="../ichq.css"/>-->
+    <script id="quiz" type="text/html">
         <li>
-            <a href="{{ uri }}">
-                <img class="image" src="{{ image }}"/>
-                <h3 class="track">{{ name }}</h3>
-                <p class="album">{{ album.name }}</p>
-                <p class="artist">{{ album.artist.name }}</p>
-            </a>
+            <a href="#">{{ name }}</a>
         </li>
+    </script>
+    <script id="question" type="text/html">
+        <li data-role="list-header">{{ name }}</li>
+        {{#alternatives}}
+        <li><a href="#">{{ . }}</a></li>
+        {{/alternatives}}
     </script>
     <script type="text/javascript">
         $(document).ready(function() {
             socket = io.connect('http://ichq.com:1337');
             socket.on('connect', function() {
-                socket.emit('join', {room: 'testing client'});
-                socket.emit('get-current-track');
-                socket.on('current-track', function(data) {
-                    var list = $('#currenttrack');
-                    $('li', list).not(":jqmData(role='list-header')").remove();
-                    list.append(ich.track(data.track)).listview('refresh');
+                $('#connectionstatus').html('Connected!');
+            });
+
+            socket.on('onConnection', function(data) {
+                var list = $('#quizlist');
+                $.each(data.rooms, function(i, v) {
+                    if(i!='') {
+                        list.append(ich.quiz({ name: i }));
+                    }
                 });
-                $('.playercontrol').click(function() {
-                    socket.emit('player', { state: $(this).data('state') });
-                });
+                list.listview('refresh');
+            });
+
+            socket.on('onCreateQuiz', function(data) {
+                var list = $('#quizlist');
+                list.append(ich.quiz(data.quiz)).listview('refresh');
+            });
+
+            socket.on('onStartQuiz', function(data) {
+                $.mobile.changePage('#started-quiz');
+            });
+
+            socket.on('onNextQuestion', function(data) {
+                $('#questioninfoheadercontainerelement').hide();
+                $('#questioncontainer').html(ich.question(data.quiz.question)).listview('refresh');
+            });
+
+            $('#quizlist a').live('click', function() {
+               var name = $('#playername').val();
+                if(name == '') {
+                    alert('Fill in name');
+                    return;
+                }
+                socket.emit('joinQuiz', { quiz: {name: $(this).html().trim() }, player: {name: name}});
+                $.mobile.changePage('#joined-quiz');
             });
         });
     </script>
@@ -46,12 +72,34 @@
         <h1>I Can Has Quiz?</h1>
     </div>
     <div data-role="content">
-        <ul id="currenttrack" data-role="listview" data-inset="true">
-            <li data-role="list-header">Now Playing</li>
-            <li>Nothing</li>
+        <div id="connectionstatus">Connecting...</div>
+        <ul id="quizlist" data-role="listview" data-inset="true">
         </ul>
-        <a class="playercontrol" data-state="pause" href="#" data-role="button">Pause</a>
-        <a class="playercontrol" data-state="resume" href="#" data-role="button">Resume</a>
+
+        <form>
+            <label for="playername">Player name:</label>
+            <input type="text" name="name" id="playername" value="bajs"  />
+        </form>
+    </div>
+</div>
+<div data-role="page" id="joined-quiz">
+   <div data-role="header">
+        <h1>I Can Has Quiz?</h1>
+    </div>
+    <div data-role="content">
+        Please wait for quiz to begin.
+    </div>
+</div>
+<div data-role="page" id="started-quiz">
+   <div data-role="header">
+        <h1>I Can Has Quiz?</h1>
+    </div>
+    <div data-role="content">
+        <div id="questioninfoheadercontainerelement">
+        Get ready for the first question!!!
+        </div>
+        <ul id="questioncontainer" data-role="listview" data-inset="true">
+        </ul>
     </div>
 </div>
 </body>

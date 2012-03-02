@@ -16,24 +16,32 @@
     </script>
 </head>
 <body>
+<div id="connectionstatus">Connecting...</div>
 <h1 id="header">I Can Haz Quiz! LOLz!!!</h1>
 
-<form id="load-playlist-form">
-    <input type="text" name="uri"/>
-    <input type="submit" value="I Can Has Playlizt?"/>
+<form id="create-quiz">
+    <p>
+        <label>
+            Playlist:
+            <input type="text" name="playlist" value="http://open.spotify.com/user/crovax/playlist/2tTBUFGoQCEVJFHLHW05oN"/>
+        </label>
+    </p>
+    <p>
+        <label>
+            Name:
+            <input type="text" name="name" value="My quiz (bajs)"/>
+        </label>
+    </p>
+    <p>
+        <input type="submit" value="Create quiz"/>
+    </p>
 </form>
 
-<form id="answer-form">
-    <input type="text" name="answer"/>
-    <input type="submit" value="I Has Answerz!"/>
-</form>
+<ol id="players"></ol>
 
-<form id="volume-form">
-    <input type="text" name="volume"/>
-    <input type="submit" value="I Has Volumez!"/>
+<form id="start-quiz">
+    <input type="submit" value="Start quiz"/>
 </form>
-
-<div id="result"></div>
 
 <img src="cat.jpg" alt="LOLCAT"/>
 

@@ -6,10 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 var app = require('http').createServer(handler)
+    ,io = require('socket.io').listen(app)
     ,fs = require("fs")
     ,url = require("url")
-    ,path = require("path")
-    ,io = require('socket.io').listen(app);
+    ,path = require("path");
 
 app.listen(1337);
 
@@ -65,39 +65,43 @@ function spotify_img_to_url(img) {
 }
 
 io.sockets.on('connection', function (socket) {
-    socket.on('join', function(data) {
-        console.log('join', data);
-        if (data.room) {
-            socket.join(data.room);
-        }
+    socket.emit('onConnection', { rooms: io.sockets.manager.rooms })
+
+    socket.on('createQuiz', function(data) {
+        console.log('createQuiz', data);
+        socket.join(data.quiz.name);
+        io.sockets.emit('onCreateQuiz', data);
     });
 
-    socket.on('leave', function(data) {
-        console.log('leave', data);
-        if (data.room) {
-            socket.leave(data.room);
-        }
+    socket.on('joinQuiz', function(data) {
+        console.log('joinQuiz', data);
+        socket.join(data.quiz.name);
+        io.sockets.in(data.quiz.name).emit('onJoinQuiz', data);
+    });
+
+    socket.on('startQuiz', function(data) {
+        io.sockets.in(data.quiz.name).emit('onStartQuiz', data);
+    });
+
+    socket.on('nextQuestion', function(data) {
+        io.sockets.in(data.quiz.name).emit('onNextQuestion', data);
+    });
+
+    socket.on('answerQuestion', function(data) {
+        io.sockets.in(data.quiz.name).emit('onAnswerQuestion', data);
+    });
+
+    socket.on('endQuestion', function(data) {
+        io.sockets.in(data.quiz.name).emit('onEndQuestion', data);
+    });
+
+    socket.on('endQuiz', function(data) {
+        io.sockets.in(data.quiz.name).emit('onEndQuiz', data);
     });
 
     socket.on('disconnect', function(data) {
         console.log('disconnect', data);
     });
-
-    socket.on('current-track', function(data) {
-        current_track(socket, data);
-    });
-
-    socket.on('get-current-track', function(data) {
-       socket.broadcast.to('testing spotify').emit('current-track', data);
-    });
-
-    socket.on('new-track', function(data) {
-        current_track(socket, data);
-    });
-
-    socket.on('player', function(data) {
-        socket.broadcast.to('testing spotify').emit('player', data);
-    })
 });
 
 function current_track(socket, data) {
