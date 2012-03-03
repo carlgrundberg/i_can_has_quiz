@@ -65,7 +65,7 @@ function spotify_img_to_url(img) {
 }
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('onConnection', { rooms: io.sockets.manager.rooms })
+    socket.emit('onConnection', { rooms: io.sockets.manager.rooms });
 
     socket.on('createQuiz', function(data) {
         console.log('createQuiz', data);
@@ -91,8 +91,8 @@ io.sockets.on('connection', function (socket) {
         io.sockets.in(data.quiz.name).emit('onAnswerQuestion', data);
     });
 
-    socket.on('endQuestion', function(data) {
-        io.sockets.in(data.quiz.name).emit('onEndQuestion', data);
+    socket.on('updateQuestion', function(data) {
+        io.sockets.in(data.quiz.name).emit('onUpdateQuestion', data);
     });
 
     socket.on('endQuiz', function(data) {
