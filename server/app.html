@@ -57,7 +57,7 @@
                     $('#questioncontainer').html(ich.question(data.quiz.currentQuestion)).listview('refresh');
                     answer = null;
                 } else {
-                    if (data.quiz.currentQuestion.answers.length == data.quiz.players.length) {
+                    if (data.quiz.currentQuestion.answered) {
                         $('#questioninfoheadercontainerelement').show();
                         $('#questioncontainer a:jqmData(id=' + data.quiz.currentQuestion.correctAlternative.id + ')').css('color', 'green');
                         if (answer && data.quiz.currentQuestion.correctAlternative.id != answer.alternative) {

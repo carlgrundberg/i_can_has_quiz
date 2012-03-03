@@ -7,11 +7,14 @@ var quiz = {
     name:'',
     playlist:null,
     status:statusCodes.NOT_STARTED,
-    players:[]
+    players: {}
 };
+
+var NEXT_QUESTION_DELAY = 1000;
 
 var socket;
 
+exports.quiz = quiz;
 exports.models = models;
 
 function current_track() {
@@ -39,6 +42,16 @@ function getArtistSuggestions(artist, cb) {
     });
 }
 
+function playerCount() {
+    var count = 0;
+    for (var i in quiz.players) {
+        if (quiz.players.hasOwnProperty(i)) {
+            count++;
+        }
+    }
+    return count;
+}
+
 function shuffle(o) {
     for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
@@ -63,13 +76,20 @@ function nextQuestion() {
             $('#answers').empty();
             socket.emit('question', {quiz:quiz });
         });
-    }, 1000);
+    }, NEXT_QUESTION_DELAY);
 }
 
 function playerList() {
     var c = $('#players').empty();
     $.each(quiz.players, function (i, v) {
         c.append('<li>' + v.name + ': ' + v.score + '</li>');
+    });
+}
+
+function answerList() {
+    var c = $('#answers').append();
+    $.each(quiz.currentQuestion.answers, function(i, v) {
+        c.append($('<li>'+v.player.name+': '+v.answer.name+'</li>'));
     });
 }
 
@@ -87,26 +107,28 @@ exports.init = function () {
     });
 
     socket.on('onJoinQuiz', function (data) {
-        quiz.players.push({name:data.player.name, score:0});
+        quiz.players[data.player.id] = { name:data.player.name, score:0};
         playerList();
         $('#start-quiz').show();
     });
 
     socket.on('onAnswerQuestion', function (data) {
-        console.log('onAnswerQuestion', data);
         if(data.player && data.answer.question == quiz.currentQuestion.id) {
             if(!quiz.currentQuestion.answers) {
                 quiz.currentQuestion.answers = [];
             }
             quiz.currentQuestion.answers.push({player: data.player, answer: data.answer});
-            if(quiz.currentQuestion.answers.length == quiz.players.length) {
+            if(quiz.currentQuestion.correctAlternative.id == data.answer.alternative) {
+                quiz.players[data.player.id].score++;
+                playerList();
+            }
+            if(quiz.currentQuestion.answers.length == playerCount()) {
                 $('#next-question input').removeAttr('disabled');
+                controls.pause();
+                quiz.currentQuestion.answered = true;
             }
             socket.emit('question', {quiz: quiz });
-            var c = $('#answers').append();
-            $.each(quiz.currentQuestion.answers, function(i, v) {
-                c.append($('<li>'+v.player.name+': '+v.answer.name+'</li>'));
-            });
+            answerList();
         }
     });
 

@@ -76,6 +76,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('joinQuiz', function(data) {
         console.log('joinQuiz', data);
         socket.join(data.quiz.name);
+        data.player.id = socket.id;
         io.sockets.in(data.quiz.name).emit('onJoinQuiz', data);
     });
 
@@ -88,6 +89,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('answerQuestion', function(data) {
+        data.player.id = socket.id;
         io.sockets.in(data.quiz.name).emit('onAnswerQuestion', data);
     });
 
