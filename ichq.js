@@ -46,29 +46,24 @@ function shuffle(o) {
 
 function nextQuestion() {
     setTimeout(function () {
-        if (!quiz.currentQuestion) {
-            quiz.currentQuestion = { name:'Who\'s the artist?' };
-        }
         var i = Math.round(Math.random() * quiz.playlist.tracks.length);
         var track = quiz.playlist.tracks[i];
-        quiz.currentQuestion.id = i;
-        quiz.currentQuestion.track = track;
-        quiz.currentQuestion.alternatives = [];
-
+        quiz.currentQuestion = { name:'Who\'s the artist?', id: i, track: track, alternatives: [], correctAlternative: track.album.artist.name };
         getArtistSuggestions(track.album.artist.name, function (suggestions) {
-            if (suggestions.length < 3) {
-                return;
-            }
-            suggestions.push(track.album.artist.name);
+            suggestions.push(quiz.currentQuestion.correctAlternative);
             $.each(shuffle(suggestions), function(i, v) {
-                quiz.currentQuestion.alternatives.push({id: i, name: v})
+                quiz.currentQuestion.alternatives.push({id: i, name: v});
+                if(v == quiz.currentQuestion.correctAlternative) {
+                    quiz.currentQuestion.correctAlternative = {id: i, name: v};
+                }
             });
 
             player.play(track);
             $('#currenttrack').html(track.name + ' - ' + track.album.artist.name);
-            socket.emit('nextQuestion', {quiz:quiz });
+            $('#answers').empty();
+            socket.emit('question', {quiz:quiz });
         });
-    }, 3000);
+    }, 1000);
 }
 
 function playerList() {
@@ -104,8 +99,11 @@ exports.init = function () {
                 quiz.currentQuestion.answers = [];
             }
             quiz.currentQuestion.answers.push({player: data.player, answer: data.answer});
-            socket.emit('updateQuestion', {quiz: quiz });
-            var c = $('#answers').empty();
+            if(quiz.currentQuestion.answers.length == quiz.players.length) {
+                $('#next-question input').removeAttr('disabled');
+            }
+            socket.emit('question', {quiz: quiz });
+            var c = $('#answers').append();
             $.each(quiz.currentQuestion.answers, function(i, v) {
                 c.append($('<li>'+v.player.name+': '+v.answer.name+'</li>'));
             });
@@ -122,7 +120,12 @@ exports.init = function () {
     $('#start-quiz').submit(function (e) {
         e.preventDefault();
         socket.emit('startQuiz', { quiz:quiz });
+        nextQuestion();
+    });
 
+    $('#next-question').submit(function (e) {
+        e.preventDefault();
+        $('input', this).attr('disabled', 'disabled');
         nextQuestion();
     });
 };

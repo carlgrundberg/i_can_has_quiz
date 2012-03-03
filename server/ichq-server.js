@@ -83,16 +83,12 @@ io.sockets.on('connection', function (socket) {
         io.sockets.in(data.quiz.name).emit('onStartQuiz', data);
     });
 
-    socket.on('nextQuestion', function(data) {
-        io.sockets.in(data.quiz.name).emit('onNextQuestion', data);
+    socket.on('question', function(data) {
+        io.sockets.in(data.quiz.name).emit('onQuestion', data);
     });
 
     socket.on('answerQuestion', function(data) {
         io.sockets.in(data.quiz.name).emit('onAnswerQuestion', data);
-    });
-
-    socket.on('updateQuestion', function(data) {
-        io.sockets.in(data.quiz.name).emit('onUpdateQuestion', data);
     });
 
     socket.on('endQuiz', function(data) {

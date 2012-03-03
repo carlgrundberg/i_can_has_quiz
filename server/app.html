@@ -4,13 +4,11 @@
     <meta charset="utf-8">
     <title>I Can Has Quiz</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.css"/>
     <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script src="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.js"></script>
     <script src="socket.io/socket.io.js"></script>
     <script src="ICanHaz.min.js"></script>
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0-rc.1/jquery.mobile-1.1.0-rc.1.min.css" />
 
     <script id="quiz" type="text/html">
         <li>
@@ -26,58 +24,70 @@
     <script type="text/javascript">
         var quiz;
         var player;
+        var answer;
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             socket = io.connect('http://ichq.com:1337');
-            socket.on('connect', function() {
+            socket.on('connect', function () {
                 $('#connectionstatus').html('Connected!');
             });
 
-            socket.on('onConnection', function(data) {
+            socket.on('onConnection', function (data) {
                 var list = $('#quizlist');
-                $.each(data.rooms, function(i, v) {
-                    if(i!='') {
-                        list.append(ich.quiz({ name: i.substring(1) }));
+                $.each(data.rooms, function (i, v) {
+                    if (i != '') {
+                        list.append(ich.quiz({ name:i.substring(1) }));
                     }
                 });
                 list.listview('refresh');
             });
 
-            socket.on('onCreateQuiz', function(data) {
+            socket.on('onCreateQuiz', function (data) {
                 var list = $('#quizlist');
                 list.append(ich.quiz(data.quiz)).listview('refresh');
             });
 
-            socket.on('onStartQuiz', function(data) {
+            socket.on('onStartQuiz', function (data) {
                 $.mobile.changePage('#questionpage');
             });
 
-            socket.on('onNextQuestion', function(data) {
-                $('#questioninfoheadercontainerelement').hide();
-                $('#questioncontainer').html(ich.question(data.quiz.currentQuestion)).listview('refresh');
+            socket.on('onQuestion', function (data) {
+                if (!quiz.currentQuestion || quiz.currentQuestion.id != data.quiz.currentQuestion.id) {
+                    $('#questioninfoheadercontainerelement').hide();
+                    $('#questioncontainer').html(ich.question(data.quiz.currentQuestion)).listview('refresh');
+                    answer = null;
+                } else {
+                    if (data.quiz.currentQuestion.answers.length == data.quiz.players.length) {
+                        $('#questioninfoheadercontainerelement').show();
+                        $('#questioncontainer a:jqmData(id=' + data.quiz.currentQuestion.correctAlternative.id + ')').css('color', 'green');
+                        if (answer && data.quiz.currentQuestion.correctAlternative.id != answer.alternative) {
+                            $('#questioncontainer a:jqmData(id=' + answer.alternative + ')').css('color', 'red');
+                        }
+                    }
+                }
+                quiz = data.quiz;
             });
 
-            socket.on('onUpdateQuestion', function(data) {
-
-            });
-
-            $('#quizlist a').live('click', function() {
-               var name = $('#playername').val();
-                if(name == '') {
+            $('#quizlist a').live('click', function () {
+                var name = $('#playername').val();
+                if (name == '') {
                     alert('Fill in name');
                     $('#playername').focus();
                     return;
                 }
-                quiz = { name: $(this).html().trim() };
-                player = { name: name, score: 0 };
-                socket.emit('joinQuiz', { quiz: quiz, player: player });
+                quiz = { name:$(this).html().trim() };
+                player = { name:name, score:0 };
+                socket.emit('joinQuiz', { quiz:quiz, player:player });
                 $.mobile.showPageLoadingMsg();
             });
 
-            $('#questioncontainer a').live('click', function() {
+            $('#questioncontainer a').live('click', function () {
                 var alternative = $(this);
                 var question = alternative.closest('ul').find("li:jqmData(role='list-header')");
-                socket.emit('answerQuestion', { quiz: quiz, player: player, answer: { question: question.jqmData('id'), alternative: alternative.jqmData('id'), name: alternative.html().trim() }});
+                if (!answer) {
+                    answer = { question:question.jqmData('id'), alternative:alternative.jqmData('id'), name:alternative.html().trim() };
+                    socket.emit('answerQuestion', { quiz:quiz, player:player, answer:answer});
+                }
             });
         });
     </script>
@@ -89,9 +99,10 @@
     </div>
     <div data-role="content">
         <p id="connectionstatus">Connecting...</p>
+
         <form>
             <label for="playername">Player name:</label>
-            <input type="text" name="name" id="playername" value="Player 1"  />
+            <input type="text" name="name" id="playername" value="Player 1"/>
         </form>
         <h3>Select quiz:</h3>
         <ul id="quizlist" data-role="listview" data-inset="true">
@@ -99,12 +110,12 @@
     </div>
 </div>
 <div data-role="page" id="questionpage">
-   <div data-role="header">
+    <div data-role="header">
         <h1>I Can Has Quiz?</h1>
     </div>
     <div data-role="content">
         <div id="questioninfoheadercontainerelement">
-            Get ready for the first question!!!
+            Get ready for the next question!!!
         </div>
         <ul id="questioncontainer" data-role="listview" data-inset="true">
         </ul>
