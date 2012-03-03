@@ -87,7 +87,7 @@ function playerList() {
 }
 
 function answerList() {
-    var c = $('#answers').append();
+    var c = $('#answers').empty();
     $.each(quiz.currentQuestion.answers, function(i, v) {
         c.append($('<li>'+v.player.name+': '+v.answer.name+'</li>'));
     });
