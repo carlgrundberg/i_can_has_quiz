@@ -11,7 +11,7 @@
     ],
     "RequiredPermissions": [
         "http://code.jquery.com",
-        "http://ichq.com",
+        "http://ichq.crov.se",
         "http://ws.audioscrobbler.com"
     ]
 }

@@ -2,11 +2,13 @@ var sp = getSpotifyApi(1);
 var models = sp.require('sp://import/scripts/api/models');
 var player = models.player;
 var library = models.library;
-var statusCodes = { NOT_STARTED:0, STARTED:1, FINISHED:2 };
+var status_codes = { NOT_STARTED:0, STARTED:1, FINISHED:2 };
+var socket_url = 'http://ichq.crov.se';
+
 var quiz = {
     name:'',
     playlist:null,
-    status:statusCodes.NOT_STARTED,
+    status:status_codes.NOT_STARTED,
     players: {}
 };
 
@@ -94,7 +96,7 @@ function answerList() {
 }
 
 exports.init = function () {
-    socket = io.connect('http://ichq.com:1337');
+    socket = io.connect(socket_url);
     var name;
     var playlistUri = 'http://open.spotify.com/user/ohlle/playlist/1qRUv1wcVvEL9eaovMlhby';
 

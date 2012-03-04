@@ -11,7 +11,7 @@ var app = require('http').createServer(handler)
     ,url = require("url")
     ,path = require("path");
 
-app.listen(1337);
+app.listen(80);
 
 function handler(req, res) {
     var uri = url.parse(req.url).pathname;

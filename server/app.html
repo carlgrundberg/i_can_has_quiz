@@ -25,9 +25,10 @@
         var quiz;
         var player;
         var answer;
+        var socket_url = 'http://'+window.location.hostname+':'+window.location.port;
 
         $(document).ready(function () {
-            socket = io.connect('http://ichq.com:1337');
+            socket = io.connect(socket_url);
             socket.on('connect', function () {
                 $('#connectionstatus').html('Connected!');
             });
