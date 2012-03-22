@@ -4,42 +4,24 @@
 <head>
     <title>SCOREzZZZZZZZ½!!!!!!!</title>
     <script type="text/javascript" src="jquery.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
     <meta charset="utf-8">
     <script type="text/javascript">
-        function get_random_color() {
-            var letters = '0123456789ABCDEF'.split('');
-            var color = '#';
-            for (var i = 0; i < 6; i++ ) {
-                color += letters[Math.round(Math.random() * 15)];
-            }
-            return color;
-        }
 
-        function blink(e) {
-            e.fadeTo('normal', 0.0001, function() {
-                $(this).fadeTo('normal', 1.0, function() {
-                    $(this).css('color', get_random_color())
-                    blink(e);
-                });
-            })
-        }
-        $(function() {
-            blink($('marquee'));
-        })
     </script>
 </head>
 <body>
-Här ska jerran fixa fina grafer! (Implementera enligt skiss nedan)
-<marquee style="color: red;">Använd för fan inte webkit-saker</marquee>
 
-<pre>
-   |           Calle
-   |   Jerry    ___
-   |    ___    |   |   Robert
-   |   |   |   |   |    ___   Fisken
-   |   |   |   |   |   |   |    ___
-   |   |   |   |   |   |   |   |   |
-   +--------------------------------------------->
-</pre>
+    <div id="container">
+
+        <div id="start">
+            <h1>Plz choozs quiz!</h1>
+            <ul class="chooseQuiz">
+                <li>My quiz</li>
+                <li>My other quiz</li>
+            </ul>
+        </div>
+    </div>
+
 </body>
 </html>

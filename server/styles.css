@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 20px normal Arial, sans-serif;
+}
+
+#container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: magenta;
+    text-shadow: 0 1px 0 #fff;
+}
